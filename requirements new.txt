@@ -1,7 +1,1 @@
-streamlit
-pandas
-selenium
-beautifulsoup4
-webdriver-manager
-plotly
-requests
+
