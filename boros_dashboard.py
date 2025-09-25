@@ -19,13 +19,22 @@ deck_versions = ["Default"]
 interaction_heavy = ["Control", "Midrange", "Tempo"]
 low_interaction = ["Aggro", "Combo", "Ramp"]
 
-# Trait-based card suggestions
-trait_suggestions = {
+# AI-suggested sideboard cards
+ai_suggestions = {
     "Resilience": ["Veil of Summer", "Loran of the Third Path", "Reckoner Bankbuster"],
     "Explosiveness": ["Reinforced Ronin", "Experimental Synthesizer", "Monastery Swiftspear"],
     "Versatility": ["Fable of the Mirror-Breaker", "Wedding Announcement", "Restless Bivouac"],
     "Adaptability": ["Chandra, Hope's Beacon", "The Wandering Emperor", "Sunfall"],
     "Late Game": ["Portal to Phyrexia", "Sanctuary Warden", "Farewell"]
+}
+
+# Meta-proven sideboard cards from recent Boros Energy decks
+meta_suggestions = {
+    "Resilience": ["Chained to the Rocks", "Wrath of the Skies", "Ghost Vacuum"],
+    "Explosiveness": ["Obsidian Charmaw", "Showdown of the Skalds", "Orim's Chant"],
+    "Versatility": ["Stony Silence", "Wear // Tear", "Blood Moon"],
+    "Adaptability": ["Thraben Charm", "Seasoned Pyromancer", "Static Prison"],
+    "Late Game": ["Fable of the Mirror-Breaker", "Ajani, Nacatl Pariah", "Arena of Glory"]
 }
 
 # Helper: fetch card image from Scryfall
@@ -131,9 +140,7 @@ with tab3:
             ))
 
         fig.update_layout(
-            polar=dict(
-                radialaxis=dict(visible=True, range=[0, 1])
-            ),
+            polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
             showlegend=True
         )
 
@@ -141,14 +148,18 @@ with tab3:
 
     # Sideboard suggestions
     st.subheader("🧙 Sideboard Suggestions")
+
     selected_version = st.selectbox("Select Deck Version", deck_versions)
     weak_traits = suggestions[selected_version]
+
+    mode = st.radio("Choose Suggestion Mode", ["Meta-Proven", "AI-Suggested"])
+    card_pool = meta_suggestions if mode == "Meta-Proven" else ai_suggestions
 
     if weak_traits:
         sideboard_list = []
         for trait in weak_traits:
             st.markdown(f"**{trait}** is below threshold. Consider:")
-            for card in trait_suggestions[trait]:
+            for card in card_pool[trait]:
                 sideboard_list.append(card)
                 url = f"https://scryfall.com/search?q={card.replace(' ', '+')}"
                 image_url = get_card_image(card)
@@ -157,7 +168,6 @@ with tab3:
                 else:
                     st.markdown(f"- [{card}]({url})")
 
-        # Exportable sideboard
         st.download_button(
             label="📥 Export Sideboard Package",
             data="\n".join(sideboard_list),
@@ -195,18 +205,4 @@ with tab4:
 
     st.subheader("📊 Simulated Trait Radar")
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(
-        r=list(sim_traits.values()),
-        theta=list(sim_traits.keys()),
-        fill='toself',
-        name="Simulated Boros"
-    ))
-    fig.update_layout(
-        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
-        showlegend=True
-    )
-    st.plotly_chart(fig, use_container_width=True)
-
-with tab5:
-    st.subheader("📄 Full Dataset")
-    st.dataframe(df)
+    fig.add_trace(go.Scatter
