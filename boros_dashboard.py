@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
 import requests
 
 # Page setup
@@ -115,14 +115,25 @@ with tab3:
 
     if selected_versions:
         radar_df = trait_df[trait_df["Deck Version"].isin(selected_versions)]
-        radar_df = radar_df.set_index("Deck Version").T.reset_index().rename(columns={"index": "Trait"})
+        radar_df = radar_df.set_index("Deck Version").T
 
-        fig = px.line_polar(radar_df, r=radar_df[selected_versions[0]], theta=radar_df["Trait"],
-                            line_close=True, name=selected_versions[0])
-        for version in selected_versions[1:]:
-            fig.add_scatterpolar(r=radar_df[version], theta=radar_df["Trait"],
-                                 line_close=True, name=version)
-        fig.update_layout(showlegend=True)
+        fig = go.Figure()
+
+        for version in selected_versions:
+            fig.add_trace(go.Scatterpolar(
+                r=radar_df[version],
+                theta=radar_df.index,
+                fill='toself',
+                name=version
+            ))
+
+        fig.update_layout(
+            polar=dict(
+                radialaxis=dict(visible=True, range=[0, 1])
+            ),
+            showlegend=True
+        )
+
         st.plotly_chart(fig)
 
     # Sideboard suggestions
