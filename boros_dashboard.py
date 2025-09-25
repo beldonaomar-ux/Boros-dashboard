@@ -110,7 +110,6 @@ with tab3:
             "Late Game": late_game
         })
 
-        # Detect weak traits
         weak = []
         if resilience < 0.15: weak.append("Resilience")
         if explosiveness < 0.15: weak.append("Explosiveness")
@@ -121,7 +120,6 @@ with tab3:
 
     trait_df = pd.DataFrame(trait_data)
 
-    # Radar chart comparison
     st.subheader("📊 Radar Chart")
     selected_versions = st.multiselect("Select Deck Versions", deck_versions, default=deck_versions)
 
@@ -130,7 +128,6 @@ with tab3:
         radar_df = radar_df.set_index("Deck Version").T
 
         fig = go.Figure()
-
         for version in selected_versions:
             fig.add_trace(go.Scatterpolar(
                 r=radar_df[version],
@@ -138,17 +135,13 @@ with tab3:
                 fill='toself',
                 name=version
             ))
-
         fig.update_layout(
             polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
             showlegend=True
         )
-
         st.plotly_chart(fig, use_container_width=True)
 
-    # Sideboard suggestions
     st.subheader("🧙 Sideboard Suggestions")
-
     selected_version = st.selectbox("Select Deck Version", deck_versions)
     weak_traits = suggestions[selected_version]
 
@@ -167,7 +160,6 @@ with tab3:
                     st.image(image_url, caption=f"[{card}]({url})", use_container_width=True)
                 else:
                     st.markdown(f"- [{card}]({url})")
-
         st.download_button(
             label="📥 Export Sideboard Package",
             data="\n".join(sideboard_list),
@@ -179,7 +171,6 @@ with tab3:
 
 with tab4:
     st.subheader("🧪 Matchup Simulator")
-
     st.markdown("Adjust matchup winrates to simulate trait impact:")
 
     control = st.slider("Winrate vs Control", 0.0, 1.0, 0.55)
@@ -205,4 +196,7 @@ with tab4:
 
     st.subheader("📊 Simulated Trait Radar")
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar
+    fig.add_trace(go.Scatterpolar(
+        r=list(sim_traits.values()),
+        theta=list(sim_traits.keys()),
+        fill
