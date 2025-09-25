@@ -11,6 +11,10 @@ st.title("🔴 Boros Energy Winrate Dashboard")
 df = pd.read_csv("boros_energy_winrate_predictions.csv")
 matchup_cols = [col for col in df.columns if col.startswith("Winrate_vs_")]
 
+# Inject default deck version
+df["deck_version"] = "Default"
+deck_versions = ["Default"]
+
 # Archetype categories
 interaction_heavy = ["Control", "Midrange", "Tempo"]
 low_interaction = ["Aggro", "Combo", "Ramp"]
@@ -65,9 +69,8 @@ with tab2:
         st.warning("No matchup data found in the CSV.")
 
 with tab3:
-    st.subheader("🧠 Trait Diagnostics by Deck Version")
+    st.subheader("🧠 Trait Diagnostics")
 
-    deck_versions = df['deck_version'].unique()
     trait_data = []
     suggestions = {}
 
@@ -107,8 +110,8 @@ with tab3:
     trait_df = pd.DataFrame(trait_data)
 
     # Radar chart comparison
-    st.subheader("📊 Radar Chart Comparison")
-    selected_versions = st.multiselect("Select Deck Versions", deck_versions, default=list(deck_versions))
+    st.subheader("📊 Radar Chart")
+    selected_versions = st.multiselect("Select Deck Versions", deck_versions, default=deck_versions)
 
     if selected_versions:
         radar_df = trait_df[trait_df["Deck Version"].isin(selected_versions)]
@@ -124,7 +127,7 @@ with tab3:
 
     # Sideboard suggestions
     st.subheader("🧙 Sideboard Suggestions")
-    selected_version = st.selectbox("Select Deck Version for Suggestions", deck_versions)
+    selected_version = st.selectbox("Select Deck Version", deck_versions)
     weak_traits = suggestions[selected_version]
 
     if weak_traits:
