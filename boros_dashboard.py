@@ -205,4 +205,5 @@ with tab4:
 
     st.subheader("📊 Simulated Trait Radar")
     fig = go.Figure()
-    fig.add_trace(go.Scatter
+    fig.add_trace(go.Scatterpolar(
+        r
