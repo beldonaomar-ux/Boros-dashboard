@@ -148,7 +148,7 @@ with tab3:
                 url = f"https://scryfall.com/search?q={card.replace(' ', '+')}"
                 image_url = get_card_image(card)
                 if image_url:
-                    st.image(image_url, caption=f"[{card}]({url})", use_column_width=True)
+                    st.image(image_url, caption=f"[{card}]({url})", use_container_width=True)
                 else:
                     st.markdown(f"- [{card}]({url})")
     else:
