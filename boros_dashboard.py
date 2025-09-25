@@ -38,7 +38,10 @@ def get_card_image(card_name):
         return None
 
 # Tabs
-tab1, tab2, tab3, tab4 = st.tabs(["📈 Winrate Trends", "🧩 Matchup Analysis", "🧠 Trait Diagnostics", "📄 Raw Data"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    "📈 Winrate Trends", "🧩 Matchup Analysis", "🧠 Trait Diagnostics",
+    "🧪 Matchup Simulator", "📄 Raw Data"
+])
 
 with tab1:
     st.subheader("⚡ Predicted Winrate Over Time")
@@ -142,18 +145,68 @@ with tab3:
     weak_traits = suggestions[selected_version]
 
     if weak_traits:
+        sideboard_list = []
         for trait in weak_traits:
             st.markdown(f"**{trait}** is below threshold. Consider:")
             for card in trait_suggestions[trait]:
+                sideboard_list.append(card)
                 url = f"https://scryfall.com/search?q={card.replace(' ', '+')}"
                 image_url = get_card_image(card)
                 if image_url:
                     st.image(image_url, caption=f"[{card}]({url})", use_container_width=True)
                 else:
                     st.markdown(f"- [{card}]({url})")
+
+        # Exportable sideboard
+        st.download_button(
+            label="📥 Export Sideboard Package",
+            data="\n".join(sideboard_list),
+            file_name="boros_sideboard.txt",
+            mime="text/plain"
+        )
     else:
         st.success("No major weaknesses detected for this version.")
 
 with tab4:
+    st.subheader("🧪 Matchup Simulator")
+
+    st.markdown("Adjust matchup winrates to simulate trait impact:")
+
+    control = st.slider("Winrate vs Control", 0.0, 1.0, 0.55)
+    midrange = st.slider("Winrate vs Midrange", 0.0, 1.0, 0.60)
+    tempo = st.slider("Winrate vs Tempo", 0.0, 1.0, 0.52)
+    aggro = st.slider("Winrate vs Aggro", 0.0, 1.0, 0.65)
+    combo = st.slider("Winrate vs Combo", 0.0, 1.0, 0.62)
+    ramp = st.slider("Winrate vs Ramp", 0.0, 1.0, 0.59)
+
+    resilience = pd.Series([control, midrange, tempo]).mean()
+    explosiveness = pd.Series([aggro, combo, ramp]).mean()
+    versatility = pd.Series([control, midrange, tempo, aggro, combo, ramp]).std()
+    adaptability = df["Predicted Winrate"].std() if "Predicted Winrate" in df.columns else 0
+    late_game = control
+
+    sim_traits = {
+        "Resilience": resilience,
+        "Explosiveness": explosiveness,
+        "Versatility": versatility,
+        "Adaptability": adaptability,
+        "Late Game": late_game
+    }
+
+    st.subheader("📊 Simulated Trait Radar")
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(
+        r=list(sim_traits.values()),
+        theta=list(sim_traits.keys()),
+        fill='toself',
+        name="Simulated Boros"
+    ))
+    fig.update_layout(
+        polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
+        showlegend=True
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with tab5:
     st.subheader("📄 Full Dataset")
     st.dataframe(df)
