@@ -12,7 +12,7 @@ This Streamlit dashboard visualizes winrate predictions for the Boros Energy dec
 ## 🚀 Live Demo
 
 Check out the live dashboard here:  
-👉 [[https://yourusername.streamlit.app](https://yourusername.streamlit.app)](https://boros-dashboard-emyjdhhnyuzbhfue8ibzsl.streamlit.app/)
+👉 (https://yourusername.streamlit.app)](https://boros-dashboard-emyjdhhnyuzbhfue8ibzsl.streamlit.app/)
 
 
 ## 🧠 How It Works
