@@ -198,5 +198,4 @@ with tab4:
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(
         r=list(sim_traits.values()),
-        theta=list(sim_traits.keys()),
-        fill
+        theta=list(sim_traits.keys
